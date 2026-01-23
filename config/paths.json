@@ -1,0 +1,16 @@
+{
+  "$schema": "./schemas/paths.schema.json",
+  "_description": "Single Source of Truth for all toolkit paths",
+  "toolkit_home": "/Users/justinfowler/projects/toolkit",
+  "agentic_leap": "${toolkit_home}/agentic-leap",
+  "projects": "${toolkit_home}/projects",
+  "config": "${toolkit_home}/config",
+  "logs": "${agentic_leap}/logs",
+  "lib": "${agentic_leap}/lib",
+  "services": "${agentic_leap}/services",
+  "agents_dir": "${agentic_leap}/agents",
+  "tools_dir": "${agentic_leap}/tools",
+  "bin": "${agentic_leap}/bin",
+  "python": "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+  "pip": "/Library/Frameworks/Python.framework/Versions/3.13/bin/pip3"
+}

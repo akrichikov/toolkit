@@ -1,0 +1,20 @@
+{
+  "$schema": "./schemas/toolkit.schema.json",
+  "_description": "Master toolkit configuration - imports all other configs",
+  "name": "toolkit",
+  "version": "0.1.0",
+  "description": "Real-time collaborative swarm assistants for building products",
+  "imports": {
+    "paths": "./paths.json",
+    "models": "./models.json",
+    "tools": "./tools.json",
+    "agents": "./agents.json",
+    "servers": "./servers.json"
+  },
+  "environment": {
+    "TOOLKIT_HOME": "${paths.toolkit_home}",
+    "PYTHONPATH": "${paths.lib}:${paths.agentic_leap}",
+    "A2A_HOST": "${servers.a2a.host}",
+    "A2A_BASE_PORT": "${servers.a2a.base_port}"
+  }
+}

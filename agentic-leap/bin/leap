@@ -1,0 +1,145 @@
+#!/bin/bash
+TOOLKIT_HOME="${TOOLKIT_HOME:-$HOME/projects/toolkit}"
+AGENTIC_LEAP="$TOOLKIT_HOME/agentic-leap"
+CONFIG_DIR="$TOOLKIT_HOME/config"
+PYTHON="/Library/Frameworks/Python.framework/Versions/3.13/bin/python3"
+
+read_config() {
+    $PYTHON -c "
+import json
+import sys
+config_file = sys.argv[1]
+key_path = sys.argv[2]
+with open(config_file) as f:
+    data = json.load(f)
+keys = key_path.split('.')
+for k in keys:
+    if isinstance(data, dict) and k in data:
+        data = data[k]
+    else:
+        sys.exit(1)
+print(data)
+" "$1" "$2" 2>/dev/null
+}
+
+get_server_config() {
+    local servers_json="$CONFIG_DIR/servers.json"
+    HOST=$(read_config "$servers_json" "a2a.host" || echo "0.0.0.0")
+    BASE_PORT=$(read_config "$servers_json" "a2a.base_port" || echo "47391")
+    PLIST_LABEL=$(read_config "$servers_json" "daemon.plist_label" || echo "com.justinfowler.agentic-leap")
+}
+
+get_agents() {
+    local agents_json="$CONFIG_DIR/agents.json"
+    $PYTHON -c "
+import json
+with open('$agents_json') as f:
+    data = json.load(f)
+agents = data.get('agents', {})
+for name in agents.keys():
+    print(name)
+" 2>/dev/null
+}
+
+get_server_config
+
+case "$1" in
+    start)
+        echo "Starting agentic-leap daemon..."
+        launchctl load ~/Library/LaunchAgents/${PLIST_LABEL}.plist 2>/dev/null || true
+        launchctl start $PLIST_LABEL
+        echo "agentic-leap daemon started"
+        ;;
+    stop)
+        echo "Stopping agentic-leap daemon..."
+        launchctl stop $PLIST_LABEL
+        echo "agentic-leap daemon stopped"
+        ;;
+    restart)
+        $0 stop
+        sleep 2
+        $0 start
+        ;;
+    status)
+        launchctl list | grep -q "$PLIST_LABEL" && echo "Running (PID: $(launchctl list | grep $PLIST_LABEL | awk '{print $1}'))" || echo "Not running"
+        ;;
+    logs)
+        tail -f "$AGENTIC_LEAP/logs/a2a_server.log"
+        ;;
+    agents)
+        echo "=== agentic-leap Swarm Agents ==="
+        local port=$BASE_PORT
+        for agent in $(get_agents); do
+            printf "%-15s http://localhost:%s\n" "$agent:" "$port"
+            port=$((port + 1))
+        done
+        ;;
+    config)
+        echo "=== Toolkit Configuration ==="
+        echo "Config Dir:    $CONFIG_DIR"
+        echo "Toolkit Home:  $TOOLKIT_HOME"
+        echo "Agentic Leap:  $AGENTIC_LEAP"
+        echo ""
+        echo "=== Server Config ==="
+        echo "Host:          $HOST"
+        echo "Base Port:     $BASE_PORT"
+        echo "Plist Label:   $PLIST_LABEL"
+        echo ""
+        echo "=== Config Files ==="
+        ls -la "$CONFIG_DIR"/*.json 2>/dev/null
+        ;;
+    dev)
+        echo "Starting in development mode..."
+        export TOOLKIT_HOME TOOLKIT_CONFIG="$CONFIG_DIR"
+        $PYTHON "$AGENTIC_LEAP/services/a2a_server.py"
+        ;;
+    reload-config)
+        echo "Reloading configuration..."
+        $0 restart
+        echo "Configuration reloaded"
+        ;;
+    edit)
+        if [ -z "$2" ]; then
+            echo "Usage: leap edit <config-name>"
+            echo "Available configs: toolkit, paths, models, tools, agents, servers"
+            exit 1
+        fi
+        ${EDITOR:-vim} "$CONFIG_DIR/$2.json"
+        ;;
+    validate)
+        echo "Validating configuration..."
+        $PYTHON -c "
+import sys
+sys.path.insert(0, '$AGENTIC_LEAP')
+from lib import get_config
+try:
+    config = get_config()
+    print('✓ All configs loaded successfully')
+    print(f'  Paths: {len(config.paths)} entries')
+    print(f'  Models: {len(config.models.get(\"providers\", {}))} providers')
+    print(f'  Tools: {len(config.tools.get(\"tool_sets\", {}))} tool sets')
+    print(f'  Agents: {len(config.agents.get(\"agents\", {}))} agents')
+    print(f'  Servers: A2A on port {config.servers.get(\"a2a\", {}).get(\"base_port\", \"?\")}')
+except Exception as e:
+    print(f'✗ Config error: {e}')
+    sys.exit(1)
+"
+        ;;
+    *)
+        echo "Usage: leap {start|stop|restart|status|logs|agents|config|dev|reload-config|edit|validate}"
+        echo ""
+        echo "Commands:"
+        echo "  start         - Start the agentic-leap daemon"
+        echo "  stop          - Stop the agentic-leap daemon"
+        echo "  restart       - Restart the daemon"
+        echo "  status        - Check daemon status"
+        echo "  logs          - Tail the server logs"
+        echo "  agents        - List available agents and endpoints"
+        echo "  config        - Show current configuration"
+        echo "  dev           - Run server in foreground (development)"
+        echo "  reload-config - Reload config and restart daemon"
+        echo "  edit <name>   - Edit a config file (toolkit|paths|models|tools|agents|servers)"
+        echo "  validate      - Validate all config files"
+        exit 1
+        ;;
+esac

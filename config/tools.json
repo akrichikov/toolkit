@@ -1,0 +1,51 @@
+{
+  "$schema": "./schemas/tools.schema.json",
+  "_description": "Tool configurations - SST for all tool definitions",
+  "tool_sets": {
+    "core": {
+      "description": "Core filesystem and system tools",
+      "tools": [
+        "file_read",
+        "file_write",
+        "shell",
+        "current_time"
+      ]
+    },
+    "web": {
+      "description": "HTTP and web interaction tools",
+      "tools": [
+        "http_request"
+      ]
+    },
+    "compute": {
+      "description": "Computation and code execution tools",
+      "tools": [
+        "calculator",
+        "python_repl"
+      ]
+    },
+    "builder": {
+      "description": "Build and development tools",
+      "tools": [
+        "shell",
+        "file_read",
+        "file_write",
+        "python_repl"
+      ]
+    },
+    "full": {
+      "description": "All available tools",
+      "tools": [
+        "file_read",
+        "file_write",
+        "shell",
+        "http_request",
+        "calculator",
+        "current_time",
+        "python_repl"
+      ]
+    }
+  },
+  "custom_tools_dir": "${paths.tools_dir}",
+  "load_from_directory": true
+}

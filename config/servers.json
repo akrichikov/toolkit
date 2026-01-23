@@ -1,0 +1,34 @@
+{
+  "$schema": "./schemas/servers.schema.json",
+  "_description": "A2A Server configurations - SST for all server definitions",
+  "a2a": {
+    "host": "0.0.0.0",
+    "base_port": 47391,
+    "version": "0.1.0",
+    "agents": {
+      "orchestrator": {
+        "port_offset": 0,
+        "enabled": true
+      },
+      "builder": {
+        "port_offset": 1,
+        "enabled": true
+      },
+      "coder": {
+        "port_offset": 2,
+        "enabled": true
+      }
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file": "${paths.logs}/a2a_server.log"
+  },
+  "daemon": {
+    "plist_label": "com.justinfowler.agentic-leap",
+    "run_at_load": true,
+    "keep_alive": true,
+    "throttle_interval": 10
+  }
+}

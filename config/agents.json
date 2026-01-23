@@ -1,0 +1,59 @@
+{
+  "$schema": "./schemas/agents.schema.json",
+  "_description": "Agent definitions - SST for all agent configurations",
+  "agents": {
+    "orchestrator": {
+      "name": "Orchestrator",
+      "description": "Master orchestrator agent that coordinates all swarm activities and delegates tasks to specialized agents",
+      "model": {
+        "provider": "bedrock",
+        "model_key": "claude-sonnet"
+      },
+      "tool_set": "full",
+      "system_prompt_template": "orchestrator",
+      "capabilities": [
+        "task_delegation",
+        "progress_monitoring",
+        "error_handling",
+        "swarm_coordination"
+      ]
+    },
+    "builder": {
+      "name": "Builder",
+      "description": "Specialized agent for building, compiling, and testing projects",
+      "model": {
+        "provider": "bedrock",
+        "model_key": "claude-sonnet"
+      },
+      "tool_set": "builder",
+      "system_prompt_template": "builder",
+      "capabilities": [
+        "build_management",
+        "test_execution",
+        "dependency_management",
+        "ci_cd_integration"
+      ]
+    },
+    "coder": {
+      "name": "Coder",
+      "description": "Specialized agent for writing, reviewing, and refactoring code",
+      "model": {
+        "provider": "bedrock",
+        "model_key": "claude-sonnet"
+      },
+      "tool_set": "core",
+      "system_prompt_template": "coder",
+      "capabilities": [
+        "code_generation",
+        "code_review",
+        "refactoring",
+        "bug_fixing"
+      ]
+    }
+  },
+  "system_prompts": {
+    "orchestrator": "You are the Orchestrator agent for the agentic-leap swarm platform.\nYour responsibilities:\n1. Coordinate tasks between specialized agents\n2. Monitor project builds in ${paths.projects}\n3. Delegate file operations, code generation, and testing tasks\n4. Maintain swarm coherence and task prioritization\n5. Report progress and handle errors gracefully\n\nAvailable project workspace: ${paths.projects}\nAgentic platform home: ${paths.agentic_leap}",
+    "builder": "You are the Builder agent responsible for:\n1. Building and compiling projects in ${paths.projects}\n2. Running tests and validating builds\n3. Managing dependencies and configurations\n4. Reporting build status to the Orchestrator",
+    "coder": "You are the Coder agent responsible for:\n1. Writing clean, efficient code\n2. Refactoring existing codebases\n3. Code review and quality assurance\n4. Implementing features and fixing bugs\n\nProject workspace: ${paths.projects}"
+  }
+}

@@ -1,0 +1,47 @@
+swarm:
+  name: agentic-leap
+  version: 0.1.0
+  description: Real-time collaborative swarm assistants for building products
+
+server:
+  host: 0.0.0.0
+  base_port: 47391
+  
+agents:
+  orchestrator:
+    port_offset: 0
+    description: Master orchestrator that coordinates swarm activities
+    capabilities:
+      - task_delegation
+      - progress_monitoring
+      - error_handling
+      - swarm_coordination
+    
+  builder:
+    port_offset: 1
+    description: Builds, compiles, and tests projects
+    capabilities:
+      - build_management
+      - test_execution
+      - dependency_management
+      - ci_cd_integration
+    
+  coder:
+    port_offset: 2
+    description: Writes, reviews, and refactors code
+    capabilities:
+      - code_generation
+      - code_review
+      - refactoring
+      - bug_fixing
+
+paths:
+  toolkit_home: /Users/justinfowler/projects/toolkit
+  agentic_leap: /Users/justinfowler/projects/toolkit/agentic-leap
+  projects: /Users/justinfowler/projects/toolkit/projects
+  logs: /Users/justinfowler/projects/toolkit/agentic-leap/logs
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: logs/a2a_server.log
